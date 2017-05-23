@@ -16,7 +16,7 @@ while true; do
                 SERVICE=$(echo "$VAR" | awk -F_ '{print tolower($3)}')
 
                 curl -s --connect-timeout 10 --max-time 20 -H "Content-Type: application/json" -X PUT \
-                    -d "{\"ID\":\"${SERVICE}:${VAL}\",\"Name\":\"${SERVICE}\",\"Tags\":[\"${TAGS}\"],\"Port\":${VAL},\"Check\":{\"tcp\":\"localhost:${VAL}\",\"Interval\":\"10s\",\"deregister_critical_service_after\":\"1m\"}}" \
+                    -d "{\"ID\":\"${HOSTNAME}:${SERVICE}:${VAL}\",\"Name\":\"${SERVICE}\",\"Tags\":[\"${TAGS}\"],\"Port\":${VAL},\"Check\":{\"tcp\":\"localhost:${VAL}\",\"Interval\":\"10s\",\"deregister_critical_service_after\":\"1m\"}}" \
                     'http://127.0.0.1:8500/v1/agent/service/register'
             fi
         done
