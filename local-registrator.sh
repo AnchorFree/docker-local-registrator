@@ -5,7 +5,12 @@ TIMEOUT=${TIMEOUT:-60}
 PREFIX=${PREFIX:-CONSUL_EXPORT}
 
 while true; do
-    timeout -t 10 docker ps -q | while read ID
+    docker_ps=$(timeout -t 10 docker ps -q)
+    if [ $? -gt 0 ]; then
+        logger -p local0.Error -s -t local-registrator "local-registrator failed to connect to docker-socket, exiting! (INFRA-3356)"
+        exit 1
+    fi
+    echo "$docker_ps" | while read ID
     do
         for ENV in $(timeout -t 10 docker inspect "$ID" --format '{{range .Config.Env}}{{println .}}{{end}}')
         do
