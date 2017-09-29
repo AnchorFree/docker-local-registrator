@@ -1,6 +1,6 @@
 FROM docker
 
-RUN apk add curl --update-cache
+RUN apk add curl jq --update-cache
 
 COPY local-registrator.sh /local-registrator.sh
 

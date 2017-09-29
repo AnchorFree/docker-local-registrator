@@ -10,6 +10,7 @@ while true; do
         logger -p local0.Error -s -t local-registrator "local-registrator failed to connect to docker-socket, exiting! (INFRA-3356)"
         exit 1
     fi
+    CONSUL_SERVICES=$(curl -s --connect-timeout 10 --max-time 20 http://127.0.0.1:8500/v1/agent/services)
     echo "$docker_ps" | while read ID
     do
         for ENV in $(timeout -t 10 docker inspect "$ID" --format '{{range .Config.Env}}{{println .}}{{end}}')
@@ -24,6 +25,9 @@ while true; do
             if [ "${VAR:0:${#PREFIX}}" == "$PREFIX" ]; then
                 SERVICE=$(echo "$VAR" | awk -F_ '{print tolower($3)}')
 
+                if echo "$CONSUL_SERVICES" | jq 'keys' | grep -q "${HOSTNAME}:${SERVICE}:${VAL}"; then
+                    continue
+                fi
                 curl -s --connect-timeout 10 --max-time 20 -H "Content-Type: application/json" -X PUT \
                     -d "{\"ID\":\"${HOSTNAME}:${SERVICE}:${VAL}\",\"Name\":\"${SERVICE}\",\"Tags\":[\"${TAGS}\"],\"Port\":${VAL},\"Check\":{\"tcp\":\"localhost:${VAL}\",\"Interval\":\"10s\",\"deregister_critical_service_after\":\"1m\"}}" \
                     'http://127.0.0.1:8500/v1/agent/service/register'
