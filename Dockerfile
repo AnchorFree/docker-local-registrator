@@ -1,4 +1,4 @@
-FROM docker
+FROM docker:17.09.1-ce
 
 RUN apk add curl jq --update-cache
 
