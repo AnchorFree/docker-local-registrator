@@ -6,7 +6,7 @@ PREFIX=${PREFIX:-CONSUL_EXPORT}
 CONSUL_AGENT_API_PORT=${CONSUL_AGENT_API_PORT:-'8500'}
 
 while true; do
-    docker_ps=$(timeout -t 10 docker ps -q)
+    docker_ps=$(timeout 10 docker ps -q)
     if [ $? -gt 0 ]; then
         logger -p local0.Error -s -t local-registrator "local-registrator failed to connect to docker-socket, exiting! (INFRA-3356)"
         exit 1
