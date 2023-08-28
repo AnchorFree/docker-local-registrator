@@ -14,7 +14,7 @@ while true; do
     CONSUL_SERVICES=$(curl -s --connect-timeout 10 --max-time 20 http://127.0.0.1:${CONSUL_AGENT_API_PORT}/v1/agent/services)
     echo "$docker_ps" | while read ID
     do
-        for ENV in $(timeout -t 10 docker inspect "$ID" --format '{{range .Config.Env}}{{println .}}{{end}}')
+        for ENV in $(timeout 10 docker inspect "$ID" --format '{{range .Config.Env}}{{println .}}{{end}}')
         do
             if [ $? -gt 0 ]; then
                 logger -p local0.Error -s -t local-registrator "local-registrator failed to connect to docker-socket, exiting! (INFRA-3356)"
